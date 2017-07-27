@@ -141,7 +141,7 @@ int getMinimumSamples(double* arr,int  samples){
 
 int main(){
 
-    int testRuns = 10;
+    int testRuns = 20;
     int samples;
     double parallelTime = 0.0;
     double sequentialTime = 0.0;
