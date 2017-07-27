@@ -3,12 +3,9 @@
 #include <time.h>       // time 
 #include <chrono>
 #include <ctime>
-#include <math.h>       /* sqrt */
+#include <math.h>       // sqrt 
+#include <algorithm>    // min
 using namespace std;
-
-// void enterData(int firstMatrix[][10], int secondMatrix[][10], int rowFirst, int columnFirst, int rowSecond, int columnSecond);
-// void multiplyMatrices(int firstMatrix[][10], int secondMatrix[][10], int multResult[][10], int rowFirst, int columnFirst, int rowSecond, int columnSecond);
-// void display(int mult[][10], int rowFirst, int columnSecond);
 
 double dRand(double fMin, double fMax)
 {
@@ -48,7 +45,7 @@ int matrix_multiply(int n, double* sequential, double* parallel)
 
     //****************** Sequential *******************
 
-    // Initializing elements of matrix mult to 0.
+    // Initializing elements of matrix C to 0.
 	for(i = 0; i < n; ++i)
 	{
 		for(j = 0; j < n; ++j)
@@ -121,9 +118,6 @@ int matrix_multiply(int n, double* sequential, double* parallel)
 }
 
 int getMinimumSamples(double* arr,int  samples){
-    for (int i = 0; i < samples; i ++){
-        cout << arr[i] << endl;
-    }
     double mean, smean;
     double total =0;
     double stotal = 0;
@@ -138,7 +132,7 @@ int getMinimumSamples(double* arr,int  samples){
     double z = sqrt(smean);
     
     double n = pow((100*1.96*z/(5*mean)), 2.0);
-    cout << "mean " << mean << " total " << total << " smean " << smean << " stotal " << stotal << " z " << z << " n " << n << endl;
+    // cout << "mean " << mean << " total " << total << " smean " << smean << " stotal " << stotal << " z " << z << " n " << n << endl;
     if(n<1){
         return 1;
     }
@@ -146,10 +140,8 @@ int getMinimumSamples(double* arr,int  samples){
 }
 
 int main(){
-    // int n;
-    // cout << "Enter n: ";
-    // cin >> n;
-    int testRuns = 20;
+
+    int testRuns = 10;
     int samples;
     double parallelTime = 0.0;
     double sequentialTime = 0.0;
@@ -164,28 +156,21 @@ int main(){
     
     for (int n =200; n<=2000;n+=200){
 
-        // matrix_multiply(i, sequential, parallel);
-        // cout << "Sequential: " << *sequential << "\t";
-        // cout << "Parallel: " << *parallel << "\n";
-
-        // Test run number of 'testRuns' samples to determine minimum samples (n) for ±5% accuracy and 95% confidence level
+        // Test run number of 'testRuns' samples to determine minimum samples for ±5% accuracy and 95% confidence level
         double* samplesSequencial = new double[testRuns];
         double* samplesParallel = new double[testRuns];
-
         for(int j = 0; j<testRuns; j++){
-            // cout << "iteration " << j << " of " << n << "\r";
             matrix_multiply(n, sequential, parallel);
             samplesSequencial[j] = *sequential;
             samplesParallel[j] = *parallel;
         }
-        if(testRuns >1){
-            samples  = getMinimumSamples(samplesSequencial, testRuns);
-            testRuns = samples; // reduce the number of initial test runs to n
-        }
 
-        // // Get n for accuracy of ±5% and 95% confidence level
-        // n = (100*1.96*5/(5*(*sequential + *parallel)/2));
-        cout << "Minimum samples [±5% 95%] :" << samples << endl;
+        // Get minimum sample size for accuracy of ±5% and 95% confidence level for both sequential, parallel algos
+        int samplesS  = getMinimumSamples(samplesSequencial, testRuns);
+        int samplesP  = getMinimumSamples(samplesParallel, testRuns);
+
+        samples = max(samplesS, samplesP); // Set minimum sample size as the maximum of above two
+        cout << "n: "<< n<< " Minimum samples [±5% 95%] :" << samples << endl;
 
         // Do for number of 'samples' samples
         totalSequenceTime = 0.0;
@@ -200,22 +185,6 @@ int main(){
         averageParallelTime = totalParallelTime/samples;
 
         cout << "Average Sequential: " << averageSequentialTime << "\t";
-        cout << "Average Parallel: " << averageParallelTime << "\n";
-
-
+        cout << "Average Parallel: " << averageParallelTime << "\n\n";
     }
-    
-
 }
-
-
-	// cout << "Output Matrix:" << endl;
-	// for(i = 0; i < n; ++i)
-	// {
-	// 	for(j = 0; j < n; ++j)
-	// 	{
-	// 		cout << C[i][j] << " ";
-	// 		if(j == n - 1)
-	// 			cout << endl << endl;
-	// 	}
-	// }
